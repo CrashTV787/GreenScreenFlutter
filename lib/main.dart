@@ -73,7 +73,7 @@ class _WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('WebView Data Bridge')),
+      //appBar: AppBar(title: const Text('WebView Data Bridge')),
       body: WebViewWidget(controller: _controller),
     );
   }
