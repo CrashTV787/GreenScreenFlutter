@@ -65,7 +65,8 @@ class _WebViewPageState extends State<WebViewPage> {
         },
       )
       ..loadRequest(
-        Uri.parse('http://10.0.2.2:8080'),
+        //Uri.parse('http://10.0.2.2:8080'),
+        Uri.parse('https://greenscreen.chrixel.com'),
       );
   }
 
