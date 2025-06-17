@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:app_usage/app_usage.dart';
 import 'package:flutter/material.dart';
+import 'package:installed_apps/app_info.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:installed_apps/installed_apps.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,17 +84,30 @@ class _WebViewPageState extends State<WebViewPage> {
 class YourNativePlugin {
   static Future<String> getDeviceData() async {
     DateTime endDate = DateTime.now();
-    DateTime startDate = endDate.subtract(const Duration(hours: 500));
+    DateTime startDate = endDate.subtract(const Duration(hours: 24));
 
+    // Get usage data
     List<AppUsageInfo> infoList = await AppUsage().getAppUsage(startDate, endDate);
 
-    List<Map<String, dynamic>> jsonList = infoList.map((info) => {
+    // Get user-installed apps only (exclude system apps)
+    List<AppInfo> installedUserApps = await InstalledApps.getInstalledApps(true);
+
+    // Create a set of package names
+    final userAppPackages = installedUserApps
+        .map((app) => app.packageName)
+        .toSet();
+
+    // Filter usage data to only include user-installed apps
+    List<Map<String, dynamic>> jsonList = infoList
+        .where((info) => userAppPackages.contains(info.packageName))
+        .map((info) => {
       'packageName': info.packageName,
       'appName': info.appName,
       'usage': info.usage.inSeconds,
       'startTime': info.startDate.toIso8601String(),
       'endTime': info.endDate.toIso8601String(),
-    }).toList();
+    })
+        .toList();
 
     return jsonEncode(jsonList);
   }
